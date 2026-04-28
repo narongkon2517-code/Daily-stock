@@ -100,9 +100,29 @@ function extractHalfKg(text) {
   return total;
 }
 
+/* ✅ เพิ่มฟังก์ชันนับสินค้า */
+function countItem(text, keyword){
+  let regex = new RegExp("(\\d+)\\s*" + keyword, "g");
+  let total = 0;
+  let m;
+
+  while((m = regex.exec(text)) !== null){
+    total += Number(m[1]);
+  }
+  return total;
+}
+
 function nextStep() {
   const text = document.getElementById("inputText").value;
-  data[branches[index]] = extractHalfKg(text);
+
+  /* ✅ เก็บข้อมูลเดิม + เพิ่มสินค้า */
+  data[branches[index]] = {
+    half: extractHalfKg(text),
+    durian: countItem(text, "ทุเรียนทอด"),
+    orange: countItem(text, "ส้มกล่อง"),
+    sugar: countItem(text, "อบน้ำตาล"),
+    yellow: countItem(text, "อบเหลือง")
+  };
 
   document.getElementById("inputText").value = "";
   index++;
@@ -127,11 +147,21 @@ function generateSummary() {
   let output = "";
 
   for (let b of branches) {
-    let val = data[b] || 0;
+    let d = data[b] || {};
+    let val = d.half || 0;
     total += val;
 
     let warn = val <= 3 ? "**" : "";
-    output += `${b} = ${warn}${val} ครึ่งโล\n`;
+
+    /* ✅ format เดิม + เพิ่มสินค้า */
+    output += `${b} = ${warn}${val} ครึ่งโล`;
+
+    if(d.durian) output += ` | ทุเรียนทอด ${d.durian}`;
+    if(d.orange) output += ` | ส้ม ${d.orange}`;
+    if(d.sugar) output += ` | น้ำตาล ${d.sugar}`;
+    if(d.yellow) output += ` | เหลือง ${d.yellow}`;
+
+    output += "\n";
   }
 
   output = `รวมทุกสาขา = ${total} ครึ่งโล ✅\n\n` + output;
