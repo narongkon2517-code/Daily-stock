@@ -100,7 +100,7 @@ function extractHalfKg(text) {
   return total;
 }
 
-/* ✅ เพิ่มฟังก์ชันนับสินค้า */
+/* ✅ นับสินค้า */
 function countItem(text, keyword){
   let regex = new RegExp("(\\d+)\\s*" + keyword, "g");
   let total = 0;
@@ -115,7 +115,6 @@ function countItem(text, keyword){
 function nextStep() {
   const text = document.getElementById("inputText").value;
 
-  /* ✅ เก็บข้อมูลเดิม + เพิ่มสินค้า */
   data[branches[index]] = {
     half: extractHalfKg(text),
     durian: countItem(text, "ทุเรียนทอด"),
@@ -144,6 +143,13 @@ document.getElementById("inputText").addEventListener("keydown", e => {
 
 function generateSummary() {
   let total = 0;
+
+  // ✅ รวมสินค้า
+  let totalDurian = 0;
+  let totalOrange = 0;
+  let totalSugar = 0;
+  let totalYellow = 0;
+
   let output = "";
 
   for (let b of branches) {
@@ -151,9 +157,13 @@ function generateSummary() {
     let val = d.half || 0;
     total += val;
 
+    totalDurian += d.durian || 0;
+    totalOrange += d.orange || 0;
+    totalSugar += d.sugar || 0;
+    totalYellow += d.yellow || 0;
+
     let warn = val <= 3 ? "**" : "";
 
-    /* ✅ format เดิม + เพิ่มสินค้า */
     output += `${b} = ${warn}${val} ครึ่งโล`;
 
     if(d.durian) output += ` | ทุเรียนทอด ${d.durian}`;
@@ -164,7 +174,11 @@ function generateSummary() {
     output += "\n";
   }
 
-  output = `รวมทุกสาขา = ${total} ครึ่งโล ✅\n\n` + output;
+  // ✅ สรุปรวมด้านบน
+  output = `รวมทุกสาขา = ${total} ครึ่งโล ✅
+ทุเรียนทอด ${totalDurian} | ส้ม ${totalOrange} | น้ำตาล ${totalSugar} | เหลือง ${totalYellow}
+
+` + output;
 
   document.getElementById("result").innerHTML =
     `<div class="result" id="finalText">${output}</div>`;
